@@ -19,13 +19,13 @@ def generate_text():
         dumps = json.loads(dumps)
 
     configuration = {
-        "project": [dumps["project"]],
-        "location": [dumps["location"]],
-        "picture": [dumps["picture"]],
+        "project": dumps["project"],
+        "location": dumps["location"],
+        "picture": dumps["picture"],
     }
 
     #Initialize Vertex AI
-    vertexai.init(project=configuration["project"], location=configuration["project"])
+    vertexai.init(project=configuration["project"], location=configuration["location"])
 
     # Load the model
     multimodal_model = GenerativeModel("gemini-pro-vision")
@@ -35,13 +35,14 @@ def generate_text():
         [
             # Add an example image
             Part.from_uri(
-                configuration["picture"]
+               configuration["picture"], mime_type="image/png"
             ),
             # Add an example query
-            "give me the gcloud commands to provision this architecture?",
+            "give me the gcloud commands to provision this architecture",
         ]
     )
 
+    response = jsonify(response.text)
     response.headers.add('Access-Control-Allow-Origin', '*')
 
     return response
